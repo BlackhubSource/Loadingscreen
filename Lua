@@ -98,5 +98,5 @@ end
 wait(1)
 ScreenGui:Destroy()
 ]])()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/hyoruhub/Lumin/refs/heads/main/krnl"))()
+
 
