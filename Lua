@@ -56,7 +56,7 @@ end
 LoadingText.Size = UDim2.new(1, 0, 0.1, 0)
 LoadingText.Position = UDim2.new(0, 0, 0.6, 0)
 LoadingText.BackgroundTransparency = 1
-LoadingText.Text = "Loading... Please Wait"
+LoadingText.Text = "Loading... Bypassing Anti Dupe"
 LoadingText.Font = Enum.Font.GothamBold
 LoadingText.TextSize = 28
 LoadingText.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -94,9 +94,5 @@ for i = 1, steps do
     LoadingBar:TweenSize(UDim2.new(pct / 100, 0, 1, 0), "Out", "Quad", 0.2, true)
     wait(totalTime / steps)
 end
-
-wait(1)
-ScreenGui:Destroy()
-]])()
 
 
