@@ -392,4 +392,4 @@ end
 spawn(simulateLoading)
 checkGameEnd()
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/BlackhubSource/Lumin/refs/heads/main/krnl", true))() 
+
