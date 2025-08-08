@@ -1,84 +1,95 @@
--- Create GUI elements
-local player = game.Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
+loadstring([[
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
 
-local screenGui = Instance.new("ScreenGui", playerGui)
-screenGui.Name = "CustomLoadingScreen"
-screenGui.ResetOnSpawn = false
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "FuturisticLoading"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = PlayerGui
 
-local background = Instance.new("Frame", screenGui)
-background.Size = UDim2.new(1, 0, 1, 0)
-background.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(1, 0, 1, 0)
+Frame.BackgroundColor3 = Color3.new(0, 0, 0)
+Frame.BorderSizePixel = 0
+Frame.Parent = ScreenGui
 
-local warningIcon = Instance.new("ImageLabel", background)
-warningIcon.Size = UDim2.new(0, 100, 0, 100)
-warningIcon.Position = UDim2.new(0.5, -50, 0.2, -50)
-warningIcon.Image = "rbxassetid://6031071050" -- Warning symbol
-warningIcon.BackgroundTransparency = 1
+-- Warning Icon
+local Warning = Instance.new("ImageLabel")
+Warning.Size = UDim2.new(0, 100, 0, 100)
+Warning.Position = UDim2.new(0.5, -50, 0.2, -50)
+Warning.BackgroundTransparency = 1
+Warning.Image = "rbxassetid://7695201739" -- Yellow warning triangle
+Warning.Parent = Frame
 
-local loadingText = Instance.new("TextLabel", background)
-loadingText.Size = UDim2.new(1, 0, 0, 50)
-loadingText.Position = UDim2.new(0, 0, 0.4, 0)
-loadingText.Text = "Loading... Please wait"
-loadingText.Font = Enum.Font.GothamBold
-loadingText.TextSize = 36
-loadingText.TextColor3 = Color3.fromRGB(255, 255, 255)
-loadingText.BackgroundTransparency = 1
+-- Loading Text
+local LoadingText = Instance.new("TextLabel")
+LoadingText.Size = UDim2.new(1, 0, 0, 50)
+LoadingText.Position = UDim2.new(0, 0, 0.35, 0)
+LoadingText.BackgroundTransparency = 1
+LoadingText.Text = "Loading, Please Wait..."
+LoadingText.TextColor3 = Color3.new(1, 1, 1)
+LoadingText.TextScaled = true
+LoadingText.Font = Enum.Font.GothamBold
+LoadingText.Parent = Frame
 
-local loadingBarBackground = Instance.new("Frame", background)
-loadingBarBackground.Size = UDim2.new(0.6, 0, 0, 30)
-loadingBarBackground.Position = UDim2.new(0.2, 0, 0.5, 0)
-loadingBarBackground.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-loadingBarBackground.BorderSizePixel = 0
+-- Loading Bar Background
+local BarBg = Instance.new("Frame")
+BarBg.Size = UDim2.new(0.6, 0, 0.05, 0)
+BarBg.Position = UDim2.new(0.2, 0, 0.5, 0)
+BarBg.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+BarBg.BorderSizePixel = 0
+BarBg.Parent = Frame
 
-local loadingBar = Instance.new("Frame", loadingBarBackground)
-loadingBar.Size = UDim2.new(0, 0, 1, 0)
-loadingBar.Position = UDim2.new(0, 0, 0, 0)
-loadingBar.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
-loadingBar.BorderSizePixel = 0
+-- Loading Bar Fill
+local BarFill = Instance.new("Frame")
+BarFill.Size = UDim2.new(0, 0, 1, 0)
+BarFill.Position = UDim2.new(0, 0, 0, 0)
+BarFill.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+BarFill.BorderSizePixel = 0
+BarFill.Parent = BarBg
 
-local percentageLabel = Instance.new("TextLabel", background)
-percentageLabel.Size = UDim2.new(1, 0, 0, 50)
-percentageLabel.Position = UDim2.new(0, 0, 0.57, 0)
-percentageLabel.Text = "0%"
-percentageLabel.Font = Enum.Font.Gotham
-percentageLabel.TextSize = 30
-percentageLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-percentageLabel.BackgroundTransparency = 1
-percentageLabel.TextStrokeTransparency = 0.5
+-- Glow
+local UIGradient = Instance.new("UIGradient", BarFill)
+UIGradient.Rotation = 0
+UIGradient.Color = ColorSequence.new{
+	ColorSequenceKeypoint.new(0.0, Color3.fromRGB(255,0,0)),
+	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0,255,0)),
+	ColorSequenceKeypoint.new(1.0, Color3.fromRGB(0,0,255))
+}
+UIGradient.Offset = Vector2.new(0, 0)
 
--- Tween service for animation
-local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
+-- Percentage Label
+local PercentText = Instance.new("TextLabel")
+PercentText.Size = UDim2.new(1, 0, 1, 0)
+PercentText.Position = UDim2.new(0, 0, 0, 0)
+PercentText.BackgroundTransparency = 1
+PercentText.Text = "0%"
+PercentText.TextColor3 = Color3.new(1, 1, 1)
+PercentText.TextScaled = true
+PercentText.Font = Enum.Font.GothamBold
+PercentText.Parent = BarBg
 
--- Animate loading bar and RGB color
-local duration = 120 -- 2 minutes
-local startTime = tick()
+-- Animate Loading Bar
+local duration = 120
+local stepTime = 0.1
+local steps = duration / stepTime
 
--- Function to interpolate RGB
-local function getRainbowColor(t)
-	local r = math.sin(t * 2) * 127 + 128
-	local g = math.sin(t * 2 + 2) * 127 + 128
-	local b = math.sin(t * 2 + 4) * 127 + 128
-	return Color3.fromRGB(r, g, b)
-end
+task.spawn(function()
+	local t = 0
+	while t <= duration do
+		local percent = math.floor((t / duration) * 100)
+		BarFill.Size = UDim2.new(percent / 100, 0, 1, 0)
+		PercentText.Text = percent .. "%"
+		
+		-- Animate RGB Gradient
+		UIGradient.Offset = Vector2.new((tick() % 5) / 5, 0)
 
--- Main loop
-RunService.RenderStepped:Connect(function()
-	local elapsed = tick() - startTime
-	local progress = math.clamp(elapsed / duration, 0, 1)
-
-	-- Update loading bar size
-	loadingBar.Size = UDim2.new(progress, 0, 1, 0)
-
-	-- Update percentage text
-	percentageLabel.Text = string.format("%d%%", math.floor(progress * 100))
-
-	-- Update glowing RGB color
-	loadingBar.BackgroundColor3 = getRainbowColor(tick())
+		wait(stepTime)
+		t = t + stepTime
+	end
+	PercentText.Text = "100%"
+	wait(0.5)
+	ScreenGui:Destroy()
 end)
-
--- Auto-remove after duration
-task.delay(duration, function()
-	screenGui:Destroy()
-end)
+]])()
